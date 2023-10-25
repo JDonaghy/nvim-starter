@@ -153,12 +153,15 @@ require('lazy').setup({
     'lukas-reineke/indent-blankline.nvim',
     -- Enable `lukas-reineke/indent-blankline.nvim`
     -- See `:help indent_blankline.txt`
+    main = "ibl",
     opts = {
       char = '┊',
       show_trailing_blankline_indent = false,
     },
+    cond = function()
+      require("ibl").setup()
+    end,
   },
-
   -- "gc" to comment visual regions/lines
   { 'numToStr/Comment.nvim', opts = {} },
 
@@ -216,7 +219,48 @@ require('lazy').setup({
       'lewis6991/gitsigns.nvim', -- OPTIONAL: for git status
       'nvim-tree/nvim-web-devicons', -- OPTIONAL: for file icons
     },
-    init = function() vim.g.barbar_auto_setup = false end,
+    init = function() 
+      vim.g.barbar_auto_setup = false 
+      local map = vim.api.nvim_set_keymap
+      local opts = { noremap = true, silent = true }
+
+      -- Move to previous/next
+      map('n', '<A-,>', '<Cmd>BufferPrevious<CR>', opts)
+      map('n', '<A-.>', '<Cmd>BufferNext<CR>', opts)
+      -- Re-order to previous/next
+      map('n', '<A-<>', '<Cmd>BufferMovePrevious<CR>', opts)
+      map('n', '<A->>', '<Cmd>BufferMoveNext<CR>', opts)
+      -- Goto buffer in position...
+      map('n', '<A-1>', '<Cmd>BufferGoto 1<CR>', opts)
+      map('n', '<A-2>', '<Cmd>BufferGoto 2<CR>', opts)
+      map('n', '<A-3>', '<Cmd>BufferGoto 3<CR>', opts)
+      map('n', '<A-4>', '<Cmd>BufferGoto 4<CR>', opts)
+      map('n', '<A-5>', '<Cmd>BufferGoto 5<CR>', opts)
+      map('n', '<A-6>', '<Cmd>BufferGoto 6<CR>', opts)
+      map('n', '<A-7>', '<Cmd>BufferGoto 7<CR>', opts)
+      map('n', '<A-8>', '<Cmd>BufferGoto 8<CR>', opts)
+      map('n', '<A-9>', '<Cmd>BufferGoto 9<CR>', opts)
+      map('n', '<A-0>', '<Cmd>BufferLast<CR>', opts)
+      -- Pin/unpin buffer
+      map('n', '<A-p>', '<Cmd>BufferPin<CR>', opts)
+      -- Close buffer
+      map('n', '<A-c>', '<Cmd>BufferClose<CR>', opts)
+      -- Wipeout buffer
+      --                 :BufferWipeout
+      -- Close commands
+      --                 :BufferCloseAllButCurrent
+      --                 :BufferCloseAllButPinned
+      --                 :BufferCloseAllButCurrentOrPinned
+      --                 :BufferCloseBuffersLeft
+      --                 :BufferCloseBuffersRight
+      -- Magic buffer-picking mode
+      map('n', '<C-p>', '<Cmd>BufferPick<CR>', opts)
+      -- Sort automatically by...
+      map('n', '<Space>bb', '<Cmd>BufferOrderByBufferNumber<CR>', opts)
+      map('n', '<Space>bd', '<Cmd>BufferOrderByDirectory<CR>', opts)
+      map('n', '<Space>bl', '<Cmd>BufferOrderByLanguage<CR>', opts)
+      map('n', '<Space>bw', '<Cmd>BufferOrderByWindowNumber<CR>', opts)
+    end,
     opts = {
       -- lazy.nvim will automatically call setup for you. put your options here, anything missing will use the default:
       -- animation = true,
@@ -225,13 +269,70 @@ require('lazy').setup({
     },
     version = '^1.0.0', -- optional: only update when a new 1.x version is released
   },
+  {'nvim-telescope/telescope-dap.nvim',
+    config = function()
+      require('telescope').load_extension('dap')
+    end,
+  },
   {'voldikss/vim-floaterm',
     config = function()
       local set = vim.keymap.set
-      set('n', '<Leader>t', '<Cmd>FloatermToggle!<CR>')
+      set('n', '<Leader>tf', '<Cmd>FloatermToggle!<CR>')
     end,
   },
-  {"ellisonleao/glow.nvim", 
+  {'akinsho/toggleterm.nvim', version = "*",
+    config = function()
+      require("toggleterm").setup{
+        open_mapping = [[<c-\>]]
+      }
+    end,
+  },
+  {'stevearc/overseer.nvim',
+    opts = {},
+    config = function()
+      require('overseer').setup({
+        strategy = {
+          "toggleterm",
+          -- load your default shell before starting the task
+          use_shell = false,
+          -- overwrite the default toggleterm "direction" parameter
+          direction = nil,
+          -- overwrite the default toggleterm "highlights" parameter
+          highlights = nil,
+          -- overwrite the default toggleterm "auto_scroll" parameter
+          auto_scroll = nil,
+          -- have the toggleterm window close and delete the terminal buffer
+          -- automatically after the task exits
+          close_on_exit = false,
+          -- have the toggleterm window close without deleting the terminal buffer
+          -- automatically after the task exits
+          -- can be "never, "success", or "always". "success" will close the window
+          -- only if the exit code is 0.
+          quit_on_exit = "never",
+          -- open the toggleterm window when a task starts
+          open_on_start = true,
+          -- mirrors the toggleterm "hidden" parameter, and keeps the task from
+          -- being rendered in the toggleable window
+          hidden = false,
+          -- command to run when the terminal is created. Combine with `use_shell`
+          -- to run a terminal command before starting the task
+          on_create = nil,
+        }
+      })
+    end,
+  },
+  {
+    "kdheepak/lazygit.nvim",
+    -- optional for floating window border decoration
+    dependencies = {
+        "nvim-lua/plenary.nvim",
+    },
+    config = function()
+      local set = vim.keymap.set
+      set('n', '<leader>gg', '<Cmd>LazyGit<CR>')
+    end
+  },
+  {"ellisonleao/glow.nvim",
     config = function()
       require('glow').setup({
         install_path = "/home/linuxbrew/.linuxbrew/bin/glow",
@@ -239,26 +340,23 @@ require('lazy').setup({
     end,
     cmd = "Glow"},
   {'mfussenegger/nvim-dap',
+    -- Based somehwat on https://aaronbos.dev/posts/debugging-csharp-neovim-nvim-dap
     config = function()
-      local dap = require('dap')
-      dap.adapters.coreclr = {
-        type = 'executable',
-        command = '/home/john/netcoredbg/netcoredbg',
-        args = {'--interpreter=vscode'}
-      }
-
-      dap.configurations.cs = {
-        {
-          type = "coreclr",
-          name = "launch - netcoredbg",
-          request = "launch",
-          program = function()
-              return vim.fn.input('Path to dll', vim.fn.getcwd() .. '/bin/Debug/', 'file')
-          end,
-        },
-      }
       local set = vim.keymap.set
-      set('n', '<F5>', require('dap').continue)
+
+      local continue = function()
+        if vim.fn.filereadable('.vscode/launch.json') then
+          require('dap.ext.vscode').load_launchjs(nil, { coreclr = {'cs'} })
+        end
+        local dap = require('dap')
+        dap.adapters.coreclr = {
+          type = 'executable',
+          command = vim.fn.expand('$HOME/netcoredbg/netcoredbg'),
+          args = {'--interpreter=vscode'}
+        }
+        require('dap').continue()
+      end
+      set('n', '<F5>', continue)
       set('n', '<F10>', require('dap').step_over)
       set('n', '<F11>', require('dap').step_into)
       set('n', '<F12>', require('dap').step_out)
@@ -368,8 +466,8 @@ require('lazy').setup({
     dapui.close()
   end
     end
-
-  },
+	
+  },	
 }, {})
 
 -- [[ Setting options ]]
@@ -692,4 +790,3 @@ cmp.setup {
 
 -- Keymappings
 vim.keymap.set("x", "<leader>p", "\"_dP")
-
