@@ -158,7 +158,7 @@ require('lazy').setup({
       char = '┊',
       show_trailing_blankline_indent = false,
     },
-    cond = function()
+    config = function()
       require("ibl").setup()
     end,
   },
