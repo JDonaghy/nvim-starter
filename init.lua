@@ -153,15 +153,24 @@ require('lazy').setup({
     'lukas-reineke/indent-blankline.nvim',
     -- Enable `lukas-reineke/indent-blankline.nvim`
     -- See `:help indent_blankline.txt`
-    main = "ibl",
     opts = {
       char = '┊',
       show_trailing_blankline_indent = false,
+      config = function()
+        require('ibl').setup()
+      end,
     },
-    config = function()
-      require("ibl").setup()
-    end,
   },
+  {
+    "utilyre/barbecue.nvim",
+    name = "barbecue",
+    version = "*",
+    dependencies = {
+      "SmiteshP/nvim-navic",
+      "nvim-tree/nvim-web-devicons", -- optional dependency
+    },
+  },
+
   -- "gc" to comment visual regions/lines
   { 'numToStr/Comment.nvim', opts = {} },
 
@@ -184,7 +193,7 @@ require('lazy').setup({
     -- NOTE: If you are having trouble with this installation,
     --       refer to the README for telescope-fzf-native for more instructions.
     build = 'make',
-    cond = function()
+    config = function()
       return vim.fn.executable 'make' == 1
     end,
   },
@@ -801,6 +810,25 @@ cmp.setup {
     { name = 'luasnip' },
   },
 }
+
+require("barbecue").setup({
+  create_autocmd = false, -- prevent barbecue from updating itself automatically
+})
+
+vim.api.nvim_create_autocmd({
+  "WinScrolled", -- or WinResized on NVIM-v0.9 and higher
+  "BufWinEnter",
+  "CursorHold",
+  "InsertLeave",
+
+  -- include this if you have set `show_modified` to `true`
+  "BufModifiedSet",
+}, {
+  group = vim.api.nvim_create_augroup("barbecue.updater", {}),
+  callback = function()
+    require("barbecue.ui").update()
+  end,
+})
 
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
