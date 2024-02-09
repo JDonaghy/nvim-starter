@@ -302,6 +302,29 @@ require('lazy').setup({
       require("toggleterm").setup{
         open_mapping = [[<c-\>]]
       }
+
+      local Terminal  = require('toggleterm.terminal').Terminal
+      local lazygit = Terminal:new({
+        cmd = "lazygit",
+        hidden = true,
+        direction = "float",
+        float_opts = {
+          border = "double",
+        },
+        on_open = function(term)
+          vim.cmd("startinsert!")
+          vim.api.nvim_buf_set_keymap(term.bufnr, "n", "q", "<cmd>close<CR>", {noremap = true, silent = true})
+        end,
+        on_close = function(term)
+          vim.cmd("startinsert!")
+        end,
+      })
+
+      function _lazygit_toggle()
+        lazygit:toggle()
+      end
+
+      vim.api.nvim_set_keymap("n", "<leader>gg", "<cmd>lua _lazygit_toggle()<CR>", {noremap = true, silent = true})
     end,
   },
   {'stevearc/overseer.nvim',
@@ -337,17 +360,6 @@ require('lazy').setup({
         }
       })
     end,
-  },
-  {
-    "kdheepak/lazygit.nvim",
-    -- optional for floating window border decoration
-    dependencies = {
-        "nvim-lua/plenary.nvim",
-    },
-    config = function()
-      local set = vim.keymap.set
-      set('n', '<leader>gg', '<Cmd>LazyGit<CR>')
-    end
   },
   {"ellisonleao/glow.nvim",
     config = function()
@@ -589,7 +601,7 @@ vim.keymap.set('n', '<leader>sd', require('telescope.builtin').diagnostics, { de
 -- See `:help nvim-treesitter`
 require('nvim-treesitter.configs').setup {
   -- Add languages to be installed here that you want installed for treesitter
-  ensure_installed = { 'c_sharp', 'c', 'cpp', 'go', 'lua', 'python', 'rust', 'tsx', 'typescript', 'vimdoc', 'vim', 'javascript', 'svelte', 'vue', 'bash' },
+  ensure_installed = { 'c_sharp', 'c', 'cpp', 'go', 'lua', 'python', 'rust', 'tsx', 'typescript', 'vimdoc', 'vim', 'javascript', 'svelte', 'vue', 'bash', 'terraform', 'bicep' },
 
   -- Autoinstall languages that are not installed. Defaults to false (but you can change for yourself!)
   auto_install = true,
@@ -718,6 +730,7 @@ local servers = {
   -- rust_analyzer = {},
   -- tsserver = {},
   -- html = { filetypes = { 'html', 'twig', 'hbs'} },
+  bicep = { filetypes = { 'bicep', 'bicepparam' } },
 
   lua_ls = {
     Lua = {
@@ -735,6 +748,13 @@ require('neodev').setup({
 -- nvim-cmp supports additional completion capabilities, so broadcast that to servers
 local capabilities = vim.lsp.protocol.make_client_capabilities()
 capabilities = require('cmp_nvim_lsp').default_capabilities(capabilities)
+
+local lspconfig = require 'lspconfig'
+local bicep_bin_path = '/home/jdonaghy/.local/share/nvim/mason/bin/bicep-lsp'
+
+lspconfig.bicep.setup{
+  cmp = { 'dotnet', bicep_bin_path },
+}
 
 -- Ensure the servers above are installed
 local mason_lspconfig = require 'mason-lspconfig'
