@@ -710,6 +710,7 @@ local on_attach = function(_, bufnr)
     vim.lsp.buf.format()
   end, { desc = 'Format current buffer with LSP' })
 end
+--
 
 -- Enable the following language servers
 --  Feel free to add/remove any LSPs that you want here. They will automatically be installed.
@@ -721,13 +722,20 @@ end
 --  define the property 'filetypes' to the map in question.
 local servers = {
    omnisharp = {},
-  -- clangd = {},
-  -- gopls = {},
-  -- pyright = {},
-  -- rust_analyzer = {},
-  -- tsserver = {},
-  -- html = { filetypes = { 'html', 'twig', 'hbs'} },
-
+   clangd = {},
+   gopls = {},
+   pyright = {},
+   rust_analyzer = {},
+   tsserver = {},
+   html = { filetypes = { 'html', 'twig', 'hbs'} },
+   bicep = { 
+    config = {
+      default_config = {
+        cmd = { "dotnet", "/usr/local/bin/bicep-langserver/Bicep.LangServer.dll" };
+        filetypes = { "bicep" };
+      };
+    }
+  },
   lua_ls = {
     Lua = {
       workspace = { checkThirdParty = false },
@@ -829,6 +837,7 @@ vim.api.nvim_create_autocmd({
     require("barbecue.ui").update()
   end,
 })
+
 
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
