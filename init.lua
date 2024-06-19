@@ -431,7 +431,8 @@ require('lazy').setup({
   },
   {'rcarriga/nvim-dap-ui',
     dependencies = {
-      "mfussenegger/nvim-dap", "nvim-neotest/nvim-nio"
+      "mfussenegger/nvim-dap",
+      "nvim-neotest/nvim-nio",
     },
     config = function()
       local dap, dapui = require("dap"), require("dapui")
@@ -746,6 +747,7 @@ local on_attach = function(_, bufnr)
     vim.lsp.buf.format()
   end, { desc = 'Format current buffer with LSP' })
 end
+--
 
 -- Enable the following language servers
 --  Feel free to add/remove any LSPs that you want here. They will automatically be installed.
@@ -873,6 +875,7 @@ vim.api.nvim_create_autocmd({
     require("barbecue.ui").update()
   end,
 })
+
 
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
