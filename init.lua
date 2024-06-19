@@ -67,6 +67,7 @@ require('lazy').setup({
 
   -- Detect tabstop and shiftwidth automatically
   'tpope/vim-sleuth',
+  'will133/vim-dirdiff',
 
   -- NOTE: This is where your plugins related to LSP can be installed.
   --  The configuration is done below. Search for lspconfig to find it below.
@@ -86,7 +87,13 @@ require('lazy').setup({
       'folke/neodev.nvim',
     },
   },
-
+  {
+      "L3MON4D3/LuaSnip",
+      -- follow latest release.
+      version = "v2.3", -- Replace <CurrentMajor> by the latest released major (first number of latest release)
+      -- install jsregexp (optional!).
+      --build = "make install_jsregexp"
+  },
   {
     -- Autocompletion
     'hrsh7th/nvim-cmp',
@@ -170,6 +177,13 @@ require('lazy').setup({
     },
   },
 
+  {
+     "jayli/vim-easycomplete",
+      dependencies = {
+        'SirVer/ultisnips'
+      }
+  },
+
   -- "gc" to comment visual regions/lines
   { 'numToStr/Comment.nvim', opts = {} },
 
@@ -239,6 +253,7 @@ require('lazy').setup({
   { "sindrets/diffview.nvim" },
   { "tpope/vim-fugitive" },
   { "junegunn/gv.vim" },
+  { "towolf/vim-helm" }, -- vim syntax for helm templates (yaml + gotmpl + sprig + custom)
   {'romgrk/barbar.nvim',
     dependencies = {
       'lewis6991/gitsigns.nvim', -- OPTIONAL: for git status
@@ -305,6 +320,25 @@ require('lazy').setup({
       set('n', '<Leader>tf', '<Cmd>FloatermToggle!<CR>')
     end,
   },
+  {
+   'kdheepak/lazygit.nvim',
+   cmd = {
+    'LazyGit',
+    'LazyGitConfig',
+    'LazyGitCurrentFile',
+    'LazyGitFilter',
+    'LazyGitFilterCurrentFile',
+   },
+   -- optional for floating window border decoration
+   dependencies = {
+    "nvim-lua/plenary.nvim",
+   },
+   -- setting the keybinding for LazyGit with 'keys' is recommended in
+   -- order to load the plugin when the command is run for the first time
+   keys = {
+    { "<leader>gg", "<cmd>LazyGit<cr>", desc = "Open lazy git" },
+   },
+  },
   {'akinsho/toggleterm.nvim', version = "*",
     config = function()
       require("toggleterm").setup{
@@ -312,27 +346,6 @@ require('lazy').setup({
       }
 
       local Terminal  = require('toggleterm.terminal').Terminal
-      local lazygit = Terminal:new({
-        cmd = "lazygit",
-        hidden = true,
-        direction = "float",
-        float_opts = {
-          border = "double",
-        },
-        on_open = function(term)
-          vim.cmd("startinsert!")
-          vim.api.nvim_buf_set_keymap(term.bufnr, "n", "q", "<cmd>close<CR>", {noremap = true, silent = true})
-        end,
-        on_close = function(term)
-          vim.cmd("startinsert!")
-        end,
-      })
-
-      function _lazygit_toggle()
-        lazygit:toggle()
-      end
-
-      vim.api.nvim_set_keymap("n", "<leader>gg", "<cmd>lua _lazygit_toggle()<CR>", {noremap = true, silent = true})
     end,
   },
   {
@@ -418,7 +431,7 @@ require('lazy').setup({
   },
   {'rcarriga/nvim-dap-ui',
     dependencies = {
-      "mfussenegger/nvim-dap",
+      "mfussenegger/nvim-dap", "nvim-neotest/nvim-nio"
     },
     config = function()
       local dap, dapui = require("dap"), require("dapui")
@@ -887,4 +900,11 @@ vim.opt.foldexpr = "nvim_treesitter#foldexpr()"
 vim.api.nvim_create_autocmd({"BufReadPost", "FileReadPost"}, {
   pattern = {"*"},
   command = "normal zR",
+})
+
+-- Automatically reload files that have changed on disk
+vim.o.autoread = true
+vim.api.nvim_create_autocmd({ "BufEnter", "CursorHold", "CursorHoldI", "FocusGained" }, {
+  command = "if mode() != 'c' | checktime | endif",
+  pattern = { "*" },
 })
