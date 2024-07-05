@@ -177,13 +177,6 @@ require('lazy').setup({
     },
   },
 
-  {
-     "jayli/vim-easycomplete",
-      dependencies = {
-        'SirVer/ultisnips'
-      }
-  },
-
   -- "gc" to comment visual regions/lines
   { 'numToStr/Comment.nvim', opts = {} },
 
@@ -854,6 +847,16 @@ cmp.setup {
   sources = {
     { name = 'nvim_lsp' },
     { name = 'luasnip' },
+    { name = 'buffer' },
+    { name = 'path'},
+    { name = 'spell', option = {
+            keep_all_entries = false,
+            enable_in_context = function()
+                return true
+            end,
+            preselect_correct_word = true,
+        },
+    },
   },
 }
 
@@ -911,3 +914,9 @@ vim.api.nvim_create_autocmd({ "BufEnter", "CursorHold", "CursorHoldI", "FocusGai
   command = "if mode() != 'c' | checktime | endif",
   pattern = { "*" },
 })
+
+vim.opt.spell = true
+
+vim.opt.spell = true
+vim.opt.spelllang = { "en_us" }
+vim.opt.spelllang = { "en_us" }
