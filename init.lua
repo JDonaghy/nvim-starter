@@ -68,6 +68,7 @@ require('lazy').setup({
   -- Detect tabstop and shiftwidth automatically
   'tpope/vim-sleuth',
   'will133/vim-dirdiff',
+  'kkharji/sqlite.lua',
 
   -- NOTE: This is where your plugins related to LSP can be installed.
   --  The configuration is done below. Search for lspconfig to find it below.
@@ -187,6 +188,7 @@ require('lazy').setup({
       { 'nvim-telescope/telescope-live-grep-args.nvim', version = "^1.0.0", },
       config = function()
         require("telescope").load_extension("live_grep_args")
+        require('telescope').load_extension('smart_history')
       end
     }
   },
@@ -247,12 +249,22 @@ require('lazy').setup({
   { "tpope/vim-fugitive" },
   { "junegunn/gv.vim" },
   { "towolf/vim-helm" }, -- vim syntax for helm templates (yaml + gotmpl + sprig + custom)
+  { 'kevinhwang91/nvim-ufo',
+    dependencies = {'kevinhwang91/promise-async'},
+    config = function()
+      require('ufo').setup({
+          provider_selector = function(bufnr, filetype, buftype)
+              return {'treesitter', 'indent'}
+          end
+      })
+    end
+  },
   {'romgrk/barbar.nvim',
     dependencies = {
       'lewis6991/gitsigns.nvim', -- OPTIONAL: for git status
       'nvim-tree/nvim-web-devicons', -- OPTIONAL: for file icons
     },
-    init = function() 
+    init = function()
       vim.g.barbar_auto_setup = false 
       local map = vim.api.nvim_set_keymap
       local opts = { noremap = true, silent = true }
@@ -485,10 +497,14 @@ vim.api.nvim_create_autocmd('TextYankPost', {
 -- See `:help telescope` and `:help telescope.setup()`
 require('telescope').setup {
   defaults = {
+    history = {
+      path = '~/.local/share/nvim/databases/telescope_history.sqlite3',
+      limit = 100,
+    },
     mappings = {
       i = {
-        ['<C-u>'] = false,
-        ['<C-d>'] = false,
+        ["<C-Down>"] = require("telescope.actions").cycle_history_next,
+        ["<C-Up>"] = require("telescope.actions").cycle_history_prev
       },
     },
   },
@@ -795,12 +811,15 @@ end
 vim.cmd('autocmd! TermOpen term://* lua set_terminal_keymaps()')
 
 -- Enable treesitter-based code folding and ensure all folds are open when file is loaded 
+vim.o.foldcolumn = '1' -- '0' is not bad
+vim.o.foldlevel = 99 -- Using ufo provider need a large value, feel free to decrease the value
+vim.o.foldlevelstart = 99
+vim.o.foldenable = true
+
+-- Using ufo provider need remap `zR` and `zM`. If Neovim is 0.6.1, remap yourself
+vim.keymap.set('n', 'zR', require('ufo').openAllFolds)
+vim.keymap.set('n', 'zM', require('ufo').closeAllFolds)
 vim.opt.foldmethod = "expr"
-vim.opt.foldexpr = "nvim_treesitter#foldexpr()"
-vim.api.nvim_create_autocmd({"BufReadPost", "FileReadPost"}, {
-  pattern = {"*"},
-  command = "normal zR",
-})
 
 -- Automatically reload files that have changed on disk
 vim.o.autoread = true
