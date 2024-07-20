@@ -400,19 +400,6 @@ require('lazy').setup({
       local opts = { noremap = true, silent = true }
 
       vim.g.vimspector_enable_mappings = "HUMAN"
-      -- -- Move to previous/next
-      -- map('n', '<A-,>', '<Cmd>BufferPrevious<CR>', opts)
-      -- map('n', '<F9>', '<cmd>call vimspector#Launch()<cr>', opts)
-      -- map('n', '<F5>', '<cmd>call vimspector#StepOver()<cr>', opts)
-      -- map('n', '<F8>', '<cmd>call vimspector#Reset()<cr>', opts)
-      -- map('n', '<F11>', '<cmd>call vimspector#StepOver()<cr>', opts)
-      -- map('n', '<F12>', '<cmd>call vimspector#StepOut()<cr>', opts)
-      -- map('n', '<F10>', '<cmd>call vimspector#StepInto()<cr>', opts)
-      -- map('n', '<Leader>di', '<Plug>VimspectorBalloonEval', opts)
-      -- map('n', '<Leader>di', '<Plug>VimspectorBalloonEval', opts)
-      -- map('n', '<Leader>db', '<cmd>call vimspector#ToggleBreakpoint()<cr>', opts)
-      -- map('n', '<Leader>dw', '<cmd>call vimspector#AddWatch()<cr>', opts)
-      -- map('n', '<Leader>de', '<cmd>call vimspector#Evaluate()<cr>', opts)
     end
   }
 }, {})
