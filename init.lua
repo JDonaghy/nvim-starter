@@ -66,9 +66,15 @@ require('lazy').setup({
   -- NOTE: First, some plugins that don't require any configuration
 
   -- Detect tabstop and shiftwidth automatically
-  'tpope/vim-sleuth',
-  'will133/vim-dirdiff',
-  'kkharji/sqlite.lua',
+  {'tpope/vim-sleuth'},
+  {'will133/vim-dirdiff'},
+  {'kkharji/sqlite.lua'},
+  {'Hoffs/omnisharp-extended-lsp.nvim'},
+  {'VonHeikemen/lsp-zero.nvim', branch = 'v3.x'},
+  {'hrsh7th/cmp-nvim-lsp'},
+  {'hrsh7th/nvim-cmp'},
+  {'L3MON4D3/LuaSnip'},
+  {'Issafalcon/lsp-overloads.nvim'},
 
   -- NOTE: This is where your plugins related to LSP can be installed.
   --  The configuration is done below. Search for lspconfig to find it below.
@@ -78,7 +84,7 @@ require('lazy').setup({
     dependencies = {
       -- Automatically install LSPs to stdpath for neovim
       { 'williamboman/mason.nvim', config = true },
-      'williamboman/mason-lspconfig.nvim',
+      { 'williamboman/mason-lspconfig.nvim' },
 
       -- Useful status updates for LSP
       -- NOTE: `opts = {}` is the same as calling `require('fidget').setup({})`
@@ -95,21 +101,21 @@ require('lazy').setup({
       -- install jsregexp (optional!).
       --build = "make install_jsregexp"
   },
-  {
-    -- Autocompletion
-    'hrsh7th/nvim-cmp',
-    dependencies = {
-      -- Snippet Engine & its associated nvim-cmp source
-      'L3MON4D3/LuaSnip',
-      'saadparwaiz1/cmp_luasnip',
-
-      -- Adds LSP completion capabilities
-      'hrsh7th/cmp-nvim-lsp',
-
-      -- Adds a number of user-friendly snippets
-      'rafamadriz/friendly-snippets',
-    },
-  },
+  -- {
+  --   -- Autocompletion
+  --   'hrsh7th/nvim-cmp',
+  --   dependencies = {
+  --     -- Snippet Engine & its associated nvim-cmp source
+  --     'L3MON4D3/LuaSnip',
+  --     'saadparwaiz1/cmp_luasnip',
+  --
+  --     -- Adds LSP completion capabilities
+  --     'hrsh7th/cmp-nvim-lsp',
+  --
+  --     -- Adds a number of user-friendly snippets
+  --     'rafamadriz/friendly-snippets',
+  --   },
+  -- },
 
   -- Useful plugin to show you pending keybinds.
   { 'folke/which-key.nvim', opts = {} },
@@ -649,13 +655,6 @@ end
 --  If you want to override the default filetypes that your language server will attach to you can
 --  define the property 'filetypes' to the map in question.
 local servers = {
-   omnisharp = {},
-  -- clangd = {},
-  -- gopls = {},
-  -- pyright = {},
-  -- rust_analyzer = {},
-  -- tsserver = {},
-  -- html = { filetypes = { 'html', 'twig', 'hbs'} },
   bicep = { filetypes = { 'bicep', 'bicepparam' } },
 
   lua_ls = {
@@ -670,6 +669,36 @@ local servers = {
 require('neodev').setup({
   library = { plugins = { "nvim-dap-ui" }, types = true },
 })
+
+
+local lsp_zero = require('lsp-zero')
+lsp_zero.configure('omnisharp', {
+  handlers = {
+    ["textDocument/definition"] = require('omnisharp_extended').handler,
+    ["textDocument/typeDefinition"] = require('omnisharp_extended').type_definition_handler,
+    ["textDocument/references"] = require('omnisharp_extended').references_handler,
+    ["textDocument/implementation"] = require('omnisharp_extended').implementation_handler,
+  }
+})
+require('lspconfig').intelephense.setup({})
+
+lsp_zero.on_attach(function(client, bufnr)
+  -- see :help lsp-zero-keybindings
+  -- to learn the available actions
+  lsp_zero.default_keymaps({buffer = bufnr})
+  if client.server_capabilities.signatureHelpProvider then
+    require('lsp-overloads').setup(client, {
+        -- keymaps = {
+        --   next_signature = "<C-j>",
+        --   previous_signature = "<C-k>",
+        --   next_parameter = "<C-l>",
+        --   previous_parameter = "<C-h>",
+        --   close_signature = "<A-s>"
+        -- },
+        -- display_automatically = true -- Uses trigger characters to automatically display the signature overloads when typing a method signature
+      })
+  end
+end)
 
 -- nvim-cmp supports additional completion capabilities, so broadcast that to servers
 local capabilities = vim.lsp.protocol.make_client_capabilities()
