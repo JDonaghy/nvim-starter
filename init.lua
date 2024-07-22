@@ -687,16 +687,7 @@ lsp_zero.on_attach(function(client, bufnr)
   -- to learn the available actions
   lsp_zero.default_keymaps({buffer = bufnr})
   if client.server_capabilities.signatureHelpProvider then
-    require('lsp-overloads').setup(client, {
-        -- keymaps = {
-        --   next_signature = "<C-j>",
-        --   previous_signature = "<C-k>",
-        --   next_parameter = "<C-l>",
-        --   previous_parameter = "<C-h>",
-        --   close_signature = "<A-s>"
-        -- },
-        -- display_automatically = true -- Uses trigger characters to automatically display the signature overloads when typing a method signature
-      })
+    require('lsp-overloads').setup(client, {})
   end
 end)
 
