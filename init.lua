@@ -66,15 +66,36 @@ require('lazy').setup({
   -- NOTE: First, some plugins that don't require any configuration
 
   -- Detect tabstop and shiftwidth automatically
-  {'tpope/vim-sleuth'},
-  {'will133/vim-dirdiff'},
-  {'kkharji/sqlite.lua'},
-  {'Hoffs/omnisharp-extended-lsp.nvim'},
-  {'VonHeikemen/lsp-zero.nvim', branch = 'v3.x'},
-  {'hrsh7th/cmp-nvim-lsp'},
-  {'hrsh7th/nvim-cmp'},
-  {'L3MON4D3/LuaSnip'},
-  {'Issafalcon/lsp-overloads.nvim'},
+  { 'tpope/vim-sleuth' },
+  { 'will133/vim-dirdiff' },
+  { 'kkharji/sqlite.lua' },
+  { 'Hoffs/omnisharp-extended-lsp.nvim' },
+  { 'VonHeikemen/lsp-zero.nvim', branch = 'v3.x' },
+  { 'hrsh7th/cmp-nvim-lsp' },
+  { 'hrsh7th/nvim-cmp' },
+  { 'L3MON4D3/LuaSnip' },
+  { 'Issafalcon/lsp-overloads.nvim' },
+  { 'f-person/git-blame.nvim' },
+  { 'sindrets/diffview.nvim' },
+  { 'junegunn/gv.vim' },
+  { 'nvim-lua/plenary.nvim' },
+  -- { 'towolf/vim-helm' }, -- vim syntax for helm templates (yaml + gotmpl + sprig + custom)
+  { 'nvim-pack/nvim-spectre',
+      config = function()
+        require('spectre').setup()
+      end
+  },
+
+  {
+    'NeogitOrg/neogit',
+    dependencies = {
+      'nvim-lua/plenary.nvim',         -- required
+      'sindrets/diffview.nvim',        -- optional - Diff integration
+
+      'nvim-telescope/telescope.nvim', -- optional
+    },
+    config = true
+  },
 
   -- NOTE: This is where your plugins related to LSP can be installed.
   --  The configuration is done below. Search for lspconfig to find it below.
@@ -250,11 +271,6 @@ require('lazy').setup({
       vim.keymap.set('n', '<leader>tt', api.tree.toggle, opts('Toggle Tree'))
     end,
   },
-  { "f-person/git-blame.nvim" },
-  { "sindrets/diffview.nvim" },
-  { "tpope/vim-fugitive" },
-  { "junegunn/gv.vim" },
-  { "towolf/vim-helm" }, -- vim syntax for helm templates (yaml + gotmpl + sprig + custom)
   { 'kevinhwang91/nvim-ufo',
     dependencies = {'kevinhwang91/promise-async'},
     config = function()
