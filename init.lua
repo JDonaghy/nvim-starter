@@ -80,24 +80,13 @@ require('lazy').setup({
   { 'junegunn/gv.vim' },
   { 'nvim-lua/plenary.nvim' },
   { 'simrat39/rust-tools.nvim' },
+  { 'jreybert/vimagit' },
   -- { 'towolf/vim-helm' }, -- vim syntax for helm templates (yaml + gotmpl + sprig + custom)
   { 'nvim-pack/nvim-spectre',
       config = function()
         require('spectre').setup()
       end
   },
-
-  {
-    'NeogitOrg/neogit',
-    dependencies = {
-      'nvim-lua/plenary.nvim',         -- required
-      'sindrets/diffview.nvim',        -- optional - Diff integration
-
-      'nvim-telescope/telescope.nvim', -- optional
-    },
-    config = true
-  },
-
   -- NOTE: This is where your plugins related to LSP can be installed.
   --  The configuration is done below. Search for lspconfig to find it below.
   {
