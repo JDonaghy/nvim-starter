@@ -81,7 +81,7 @@ require('lazy').setup({
   { 'nvim-lua/plenary.nvim' },
   { 'simrat39/rust-tools.nvim' },
   { 'jreybert/vimagit' },
-  { 'tpope/vim-fugitive' }, -- vimmagit does not supoport pull/push yet
+  { 'tpope/vim-fugitive' }, -- vimmagit does not support pull/push yet
   -- { 'towolf/vim-helm' }, -- vim syntax for helm templates (yaml + gotmpl + sprig + custom)
   { 'nvim-pack/nvim-spectre',
       config = function()
