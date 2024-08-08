@@ -203,12 +203,37 @@ require('lazy').setup({
   { 'nvim-telescope/telescope.nvim', branch = '0.1.x',
      dependencies = {
       { 'nvim-lua/plenary.nvim' },
+      { 'jonarrien/telescope-cmdline.nvim' },
       { 'nvim-telescope/telescope-live-grep-args.nvim', version = "^1.0.0", },
       config = function()
         require("telescope").load_extension("live_grep_args")
         require('telescope').load_extension('smart_history')
       end
-    }
+    },
+    keys = {
+      { '<Leader>;', '<cmd>Telescope cmdline<cr>', desc = 'Cmdline' }
+    },
+    opts = {
+      extensions = {
+        cmdline = {
+          picker = {
+            layout_config = {
+              width  = 120,
+              height = 25,
+            }
+          },
+          mappings    = {
+            complete      = '<Tab>',
+            run_selection = '<C-CR>',
+            run_input     = '<CR>',
+          },
+        },
+      },
+    },
+    config = function(_, opts)
+      require("telescope").setup(opts)
+      require("telescope").load_extension('cmdline')
+    end,
   },
 
   -- Fuzzy Finder Algorithm which requires local dependencies to be built.
@@ -530,18 +555,25 @@ vim.keymap.set('n', '<leader>sh', require('telescope.builtin').help_tags, { desc
 vim.keymap.set('n', '<leader>sw', require('telescope.builtin').grep_string, { desc = '[S]earch current [W]ord' })
 vim.keymap.set('n', '<leader>sg', require('telescope.builtin').live_grep, { desc = '[S]earch by [G]rep' })
 vim.keymap.set('n', '<leader>sd', require('telescope.builtin').diagnostics, { desc = '[S]earch [D]iagnostics' })
+vim.keymap.set('n', '<leader>sb', require("telescope.builtin").buffers, { desc = '[S]earch [B]uffers ' })
+vim.keymap.set('n', '<leader>sc', require("telescope.builtin").commands, { desc = '[S]earch [C]ommands ' })
+vim.keymap.set('n', '<leader>st', require("telescope.builtin").treesitter, { desc = '[S]earch [T]reesitter ' })
+vim.keymap.set('n', '<leader>ss', require("telescope.builtin").current_buffer_fuzzy_find, { desc = '[S]earch [s]search ' })
 vim.keymap.set('n', '<leader>sr', require("telescope").extensions.live_grep_args.live_grep_args, { noremap = true, desc = '[S]earch current [R]ipgrep ' })
 
 -- [[ Configure Treesitter ]]
 -- See `:help nvim-treesitter`
 require('nvim-treesitter.configs').setup {
   -- Add languages to be installed here that you want installed for treesitter
-  ensure_installed = { 'c_sharp', 'c', 'cpp', 'go', 'lua', 'python', 'rust', 'tsx', 'typescript', 'vimdoc', 'vim', 'javascript', 'svelte', 'vue', 'bash', 'terraform', 'bicep' },
+  ensure_installed = { 'c_sharp', 'c', 'cpp', 'go', 'lua', 'python', 'rust', 'tsx', 'typescript', 'vimdoc', 'vim', 'javascript', 'svelte', 'vue', 'bash', 'terraform' },
 
   -- Autoinstall languages that are not installed. Defaults to false (but you can change for yourself!)
   auto_install = true,
 
-  highlight = { enable = true },
+  highlight = { 
+    enable = true,  
+    disable = { "bicep" } 
+  },
   indent = { enable = true },
   incremental_selection = {
     enable = true,
@@ -662,8 +694,6 @@ end
 --  If you want to override the default filetypes that your language server will attach to you can
 --  define the property 'filetypes' to the map in question.
 local servers = {
-  bicep = { filetypes = { 'bicep', 'bicepparam' } },
-
   lua_ls = {
     Lua = {
       workspace = { checkThirdParty = false },
@@ -702,14 +732,6 @@ end)
 local capabilities = vim.lsp.protocol.make_client_capabilities()
 capabilities = require('cmp_nvim_lsp').default_capabilities(capabilities)
 
-local lspconfig = require 'lspconfig'
-local bicep_bin_path = '/home/jdonaghy/.local/share/nvim/mason/bin/bicep-lsp'
-
-lspconfig.bicep.setup{
-  cmp = { 'dotnet', bicep_bin_path },
-}
-
--- Ensure the servers above are installed
 local mason_lspconfig = require 'mason-lspconfig'
 
 mason_lspconfig.setup {
@@ -723,6 +745,12 @@ mason_lspconfig.setup_handlers {
       on_attach = on_attach,
       settings = servers[server_name],
       filetypes = (servers[server_name] or {}).filetypes,
+    }
+  end,
+
+  ["bicep"] = function ()
+    require('lspconfig').bicep.setup {
+      cmd = { 'dotnet', '/home/jdonaghy/.local/share/nvim/mason/packages/bicep-lsp/extension/bicepLanguageServer/Bicep.LangServer.dll' },
     }
   end,
 
@@ -838,6 +866,13 @@ end
 
 -- if you only want these mappings for toggle term use term://*toggleterm#* instead
 vim.cmd('autocmd! TermOpen term://* lua set_terminal_keymaps()')
+
+vim.filetype.add({
+  extension = {
+    bicep = 'bicep',
+    biceparams = 'bicep',
+  }
+})
 
 -- Enable treesitter-based code folding and ensure all folds are open when file is loaded 
 vim.o.foldcolumn = '1' -- '0' is not bad
