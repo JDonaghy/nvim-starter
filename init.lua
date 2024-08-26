@@ -88,6 +88,13 @@ require('lazy').setup({
         require('spectre').setup()
       end
   },
+  { 'kosayoda/nvim-lightbulb',
+      config = function()
+        require("nvim-lightbulb").setup({
+          autocmd = { enabled = true }
+        })
+      end
+  },
   -- NOTE: This is where your plugins related to LSP can be installed.
   --  The configuration is done below. Search for lspconfig to find it below.
   {
@@ -280,7 +287,11 @@ require('lazy').setup({
     },
     config = function()
       local api = require "nvim-tree.api"
-      require("nvim-tree").setup {}
+      require("nvim-tree").setup {
+        update_focused_file = {
+          enable = true,
+        }
+      }
       local function opts(desc)
         return { desc = "nvim-tree: " .. desc, buffer = bufnr, noremap = true, silent = true, nowait = true }
       end
@@ -700,6 +711,9 @@ local servers = {
       telemetry = { enable = false },
     },
   },
+  omnisharp = {
+    filetypes = { 'cs', 'csx' },
+  }
 }
 
 -- Setup neovim lua configuration
