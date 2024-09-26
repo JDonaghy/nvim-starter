@@ -82,7 +82,12 @@ require('lazy').setup({
   { 'simrat39/rust-tools.nvim' },
   { 'jreybert/vimagit' },
   { 'tpope/vim-fugitive' }, -- vimmagit does not support pull/push yet
-  -- { 'towolf/vim-helm' }, -- vim syntax for helm templates (yaml + gotmpl + sprig + custom)
+  { 'towolf/vim-helm' }, -- vim syntax for helm templates (yaml + gotmpl + sprig + custom)
+  { 'PhilRunninger/bufselect',
+      init = function()
+        vim.api.nvim_set_keymap ('n', '<Space>bv', '<Cmd>ShowBufferList<CR>', { noremap = true, silent = true })
+      end,
+  },
   { 'nvim-pack/nvim-spectre',
       config = function()
         require('spectre').setup()
@@ -780,9 +785,16 @@ mason_lspconfig.setup_handlers {
         end,
       },
     })
-  end
-}
+  end,
 
+  ['helm_ls'] = function ()
+    require('lspconfig').helm_ls.setup {
+      yamlls = {
+        path = "yaml-language-server",
+      }
+    }
+  end,
+}
 -- [[ Configure nvim-cmp ]]
 -- See `:help cmp`
 local cmp = require 'cmp'
@@ -911,3 +923,16 @@ vim.opt.spell = true
 vim.opt.spell = true
 vim.opt.spelllang = { "en_us" }
 vim.opt.spelllang = { "en_us" }
+
+vim.g.clipboard = {
+        name = "win32yank-wsl",
+        copy = {
+            ["+"] = "win32yank.exe -i --crlf",
+            ["*"] = "win32yank.exe -i --crlf",
+        },
+        paste = {
+            ["+"] = "win32yank.exe -o --lf",
+            ["*"] = "win32yank.exe -o --lf",
+        },
+        cache_enabled = true,
+    }
