@@ -448,6 +448,15 @@ require('lazy').setup({
       })
     end,
   },
+  {
+    'MeanderingProgrammer/render-markdown.nvim',
+    dependencies = { 'nvim-treesitter/nvim-treesitter', 'echasnovski/mini.nvim' }, -- if you use the mini.nvim suite
+    -- dependencies = { 'nvim-treesitter/nvim-treesitter', 'echasnovski/mini.icons' }, -- if you use standalone mini plugins
+    -- dependencies = { 'nvim-treesitter/nvim-treesitter', 'nvim-tree/nvim-web-devicons' }, -- if you prefer nvim-web-devicons
+    ---@module 'render-markdown'
+    ---@type render.md.UserConfig
+    opts = {},
+  },
   {"ellisonleao/glow.nvim",
     config = function()
       require('glow').setup({
@@ -646,6 +655,8 @@ require('nvim-treesitter.configs').setup {
   },
 }
 
+vim.keymap.set('n', '<leader>h', '<Cmd>set hlsearch<CR>', { desc = 'Enable Search highlighting' })
+vim.keymap.set('n', '<leader>H', '<Cmd>set hlsearch!<CR>', { desc = 'Diable Search highlighting' })
 -- Diagnostic keymaps
 vim.keymap.set('n', '[d', vim.diagnostic.goto_prev, { desc = 'Go to previous diagnostic message' })
 vim.keymap.set('n', ']d', vim.diagnostic.goto_next, { desc = 'Go to next diagnostic message' })
