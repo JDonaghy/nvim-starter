@@ -393,6 +393,16 @@ require('lazy').setup({
   --   { "<leader>gg", "<cmd>LazyGit<cr>", desc = "Open lazy git" },
   --  },
   -- },
+  {
+  'rmagatti/auto-session',
+    lazy = false,
+    config = function()
+      require("auto-session").setup{
+        -- log_level = 'debug',
+        args_allow_files_auto_save = true
+      }
+    end
+  },
   {'akinsho/toggleterm.nvim', version = "*",
     config = function()
       require("toggleterm").setup{
@@ -947,3 +957,4 @@ vim.g.clipboard = {
         },
         cache_enabled = true,
     }
+
